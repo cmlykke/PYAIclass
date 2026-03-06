@@ -1,0 +1,173 @@
+
+---------------------------------------------------------------
+# Data loaders
+batch_size = 128
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+-------------------------------------------------------------------
+
+100%|██████████| 9.91M/9.91M [00:02<00:00, 3.86MB/s]
+100%|██████████| 28.9k/28.9k [00:00<00:00, 350kB/s]
+100%|██████████| 1.65M/1.65M [00:00<00:00, 2.02MB/s]
+100%|██████████| 4.54k/4.54k [00:00<00:00, 8.95MB/s]
+Train size: 49800, Val size: 10200, Test size: 10000
+
+
+
+
+
+1. Basic DNN
+
+---------------------------------------
+model_basic = BasicDNN()
+summary(model_basic, input_size=(128, 1, 28, 28))
+----------------------------------------
+
+
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+BasicDNN                                 [128, 10]                 --
+├─Flatten: 1-1                           [128, 784]                --
+├─Linear: 1-2                            [128, 384]                301,440
+├─ReLU: 1-3                              [128, 384]                --
+├─Linear: 1-4                            [128, 128]                49,280
+├─ReLU: 1-5                              [128, 128]                --
+├─Linear: 1-6                            [128, 10]                 1,290
+==========================================================================================
+Total params: 352,010
+Trainable params: 352,010
+Non-trainable params: 0
+Total mult-adds (Units.MEGABYTES): 45.06
+==========================================================================================
+Input size (MB): 0.40
+Forward/backward pass size (MB): 0.53
+Params size (MB): 1.41
+Estimated Total Size (MB): 2.34
+==========================================================================================
+
+
+----------------------------------------------------
+print("Training Basic DNN...")
+history_basic = train_model(model_basic, train_loader, val_loader, epochs=10)
+all_histories.append(('Basic DNN', history_basic))
+----------------------------------------------------------------
+
+Epoch 9: Loss: 0.0160, Acc: 0.9947, Val Loss: 0.0854, Val Acc: 0.9768
+
+Epoch 10: Loss: 0.0149, Acc: 0.9950, Val Loss: 0.0932, Val Acc: 0.9746
+
+
+
+
+
+
+2. Basic DNN with Regularization
+
+
+-------------------------------------
+print("Training Basic DNN with L2 Regularization...")
+# TF L2(0.01) corresponds to weight_decay=0.01 in PyTorch Adam
+history_reg = train_model(model_reg, train_loader, val_loader, epochs=10, weight_decay=0.01)
+all_histories.append(('Basic DNN reg.', history_reg))
+-------------------------------------
+
+
+Epoch 4: Loss: 0.2540, Acc: 0.9329, Val Loss: 0.2551, Val Acc: 0.9329
+
+Epoch 5: Loss: 0.2433, Acc: 0.9374, Val Loss: 0.2766, Val Acc: 0.9261
+
+
+-----------------------------------------
+evaluate_model(model_reg, test_loader)
+------------------------------------------
+
+Test Loss: 0.2125, Test Accuracy: 0.9442
+(0.21246811093091963, 0.9442)
+
+
+
+
+
+
+
+3. DNN Reg. Long Training
+
+
+------------------------------------
+print("Training Basic DNN with L2 Regularization (25 epochs)...")
+history_long = train_model(model_long, train_loader, val_loader, epochs=25, weight_decay=0.01)
+all_histories.append(('DNN reg. long training.', history_long))
+------------------------------------
+
+Epoch 24: Loss: 0.2114, Acc: 0.9485, Val Loss: 0.2206, Val Acc: 0.9469
+
+Epoch 25: Loss: 0.2122, Acc: 0.9477, Val Loss: 0.2174, Val Acc: 0.9469
+
+
+--------------------------------
+evaluate_model(model_long, test_loader)
+--------------------------------
+
+Test Loss: 0.1984, Test Accuracy: 0.9529
+(0.19836182790994644, 0.9529)
+
+
+
+
+
+4. CNN
+
+-----------------------------
+model_cnn = CNN()
+summary(model_cnn, input_size=(128, 1, 28, 28))
+------------------------------
+
+
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+CNN                                      [128, 10]                 --
+├─Conv2d: 1-1                            [128, 32, 26, 26]         320
+├─ReLU: 1-2                              [128, 32, 26, 26]         --
+├─MaxPool2d: 1-3                         [128, 32, 13, 13]         --
+├─Conv2d: 1-4                            [128, 64, 11, 11]         18,496
+├─ReLU: 1-5                              [128, 64, 11, 11]         --
+├─MaxPool2d: 1-6                         [128, 64, 5, 5]           --
+├─Flatten: 1-7                           [128, 1600]               --
+├─Dropout: 1-8                           [128, 1600]               --
+├─Linear: 1-9                            [128, 10]                 16,010
+==========================================================================================
+Total params: 34,826
+Trainable params: 34,826
+Non-trainable params: 0
+Total mult-adds (Units.MEGABYTES): 316.20
+==========================================================================================
+Input size (MB): 0.40
+Forward/backward pass size (MB): 30.09
+Params size (MB): 0.14
+Estimated Total Size (MB): 30.63
+==========================================================================================
+
+
+-------------------------------------
+print("Training CNN (25 epochs)...")
+history_cnn = train_model(model_cnn, train_loader, val_loader, epochs=25)
+all_histories.append(('CNN', history_cnn))
+----------------------------------------
+
+Epoch 24: Loss: 0.0318, Acc: 0.9896, Val Loss: 0.0353, Val Acc: 0.9905
+
+Epoch 25: Loss: 0.0299, Acc: 0.9902, Val Loss: 0.0337, Val Acc: 0.9911
+
+
+
+----------------------------
+evaluate_model(model_cnn, test_loader)
+----------------------------
+
+Test Loss: 0.0247, Test Accuracy: 0.9914
+(0.024677721176412887, 0.9914)
+
+
