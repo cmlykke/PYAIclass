@@ -357,29 +357,6 @@ print(importance_table)
 
 
 ```python
-
-
-# Feature Importance
-importances = rf_model.feature_importances_
-indices = np.argsort(importances)[::-1]
-
-plt.figure()
-plt.title("Feature importances")
-plt.bar(range(X.shape[1]), importances[indices], align="center")
-plt.xticks(range(X.shape[1]), [features[i] for i in indices], rotation=45)
-plt.show()
-
-
-```
-
-
-    
-![png](Car-classification_public_files/Car-classification_public_11_0.png)
-    
-
-
-
-```python
 # %%
 # Strategy for Fine-tuning Decision Trees and Random Forests
 # Given the small dataset (~400 rows) and class imbalance (Origin 1 is majority),
